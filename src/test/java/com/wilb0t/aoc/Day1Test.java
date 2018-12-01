@@ -51,4 +51,29 @@ public class Day1Test {
   public void testGetFrequency_input1() {
     assertThat(testInst.getFrequency(input1), is(574));
   }
+
+  @Test
+  public void testGetFirstRepFreq_case1() {
+    assertThat(testInst.getFirstRepFreq(ImmutableList.of(1, -1)), is(0L));
+  }
+
+  @Test
+  public void testGetFirstRepFreq_case2() {
+    assertThat(testInst.getFirstRepFreq(ImmutableList.of(+3, +3, +4, -2, -4)), is(10L));
+  }
+
+  @Test
+  public void testGetFirstRepFreq_case3() {
+    assertThat(testInst.getFirstRepFreq(ImmutableList.of(-6, +3, +8, +5, -6)), is(5L));
+  }
+
+  @Test
+  public void testGetFirstRepFreq_case4() {
+    assertThat(testInst.getFirstRepFreq(ImmutableList.of(+7, +7, -2, -7, -4)), is(14L));
+  }
+
+  @Test
+  public void testGetFirstRepFreq_input1() {
+    assertThat(testInst.getFirstRepFreq(input1), is(452L));
+  }
 }
