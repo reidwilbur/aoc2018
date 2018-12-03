@@ -27,6 +27,18 @@ public class Day3 {
     return Arrays.stream(fabric).filter(i -> i == OVERLAP_VAL).count();
   }
 
+  public long getClaimWithNoOverlap(List<Claim> claims) {
+    int[] fabric = new int[FABRIC_SIZE * FABRIC_SIZE];
+
+    claims.forEach(c -> fillClaim(fabric, c));
+
+    return claims.stream()
+        .filter(c -> checkClaim(fabric, c))
+        .findFirst()
+        .map(Claim::id)
+        .orElseThrow(() -> new IllegalStateException("bad times"));
+  }
+
   void fillClaim(int[] fabric, Claim c) {
     int ofs = (c.yOfs() * FABRIC_SIZE) + c.xOfs();
     for (int y = 0; y < c.ySize(); y++) {
@@ -35,6 +47,17 @@ public class Day3 {
         fabric[fabidx] = fabric[fabidx] == EMPTY_VAL ? c.id() : OVERLAP_VAL;
       }
     }
+  }
+
+  boolean checkClaim(int[] fabric, Claim c) {
+    int ofs = (c.yOfs() * FABRIC_SIZE) + c.xOfs();
+    for (int y = 0; y < c.ySize(); y++) {
+      for (int x = 0; x < c.xSize(); x++) {
+        int fabidx = ofs + (y * FABRIC_SIZE) + x;
+          if (fabric[fabidx] != c.id()) return false;
+      }
+    }
+    return true;
   }
 
   public static Claim toClaim(String line) {

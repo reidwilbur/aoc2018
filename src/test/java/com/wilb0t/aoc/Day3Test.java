@@ -61,4 +61,14 @@ public class Day3Test {
   public void testGetOverlap_input1() {
     assertThat(testInst.getOverlap(input1), is(109785L));
   }
+
+  @Test
+  public void testGetClaimWithNoOverlap_case1() {
+    assertThat(testInst.getClaimWithNoOverlap(testInput1), is(3L));
+  }
+
+  @Test
+  public void testGetClaimWithNoOverlap_input1() {
+    assertThat(testInst.getClaimWithNoOverlap(input1), is(504L));
+  }
 }
