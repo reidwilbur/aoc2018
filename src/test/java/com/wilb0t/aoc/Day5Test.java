@@ -42,4 +42,15 @@ public class Day5Test {
   public void testReact_input1() {
     assertThat(testInst.react(input1), is(11946L));
   }
+
+  @Test
+  public void testReactReduce_case1() {
+    assertThat(testInst.reactReduce(testInput1), is(4L));
+  }
+
+  //@Test
+  // takes 15ish seconds to run, yay regex and brute force!
+  public void testReactReduce_input1() {
+    assertThat(testInst.reactReduce(input1), is(4240L));
+  }
 }

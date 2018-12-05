@@ -1,13 +1,6 @@
 package com.wilb0t.aoc;
 
-import com.google.common.io.CharStreams;
-import io.norberg.automatter.AutoMatter;
-import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -16,7 +9,7 @@ import java.util.stream.Stream;
 
 public class Day5 {
 
-  static final String reactPatternStr = IntStream.range(0, 26)
+  private static final String reactPatternStr = IntStream.range(0, 26)
       .map(i -> i + 'a')
       .mapToObj(i -> (char) i)
       .flatMap(c -> Stream.of(
@@ -24,7 +17,7 @@ public class Day5 {
           String.valueOf(Character.toUpperCase(c)) + String.valueOf(c)
       )).collect(Collectors.joining("|"));
 
-  static final Pattern reactPattern = Pattern.compile(reactPatternStr);
+  private static final Pattern reactPattern = Pattern.compile(reactPatternStr);
 
   public long react(String polymer) {
     boolean reacted = true;
@@ -38,5 +31,16 @@ public class Day5 {
       lastPolymer = newPolymer;
     }
     return lastPolymer.length();
+  }
+
+  public long reactReduce(String polymer) {
+    return IntStream.range(0, 26)
+        .map(i -> i + 'a')
+        .mapToObj(i -> (char) i)
+        .map(c -> "[" + c + Character.toUpperCase(c) +  "]")
+        .map(pattern -> polymer.replaceAll(pattern, ""))
+        .map(this::react)
+        .min(Comparator.comparing(l -> l))
+        .orElseThrow(() -> new IllegalStateException("bad times"));
   }
 }
