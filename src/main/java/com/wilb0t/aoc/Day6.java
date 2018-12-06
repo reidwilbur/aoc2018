@@ -1,6 +1,5 @@
 package com.wilb0t.aoc;
 
-import io.norberg.automatter.AutoMatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,41 +42,58 @@ public class Day6 {
   }
 
   public long getMaxFiniteArea(List<Coord> coords) {
-    int minx = coords.stream()
-        .map(Coord::x)
-        .min(Comparator.naturalOrder())
-        .orElseThrow(() -> new IllegalStateException("no min x"));
-    int miny = coords.stream()
-        .map(Coord::y)
-        .min(Comparator.naturalOrder())
-        .orElseThrow(() -> new IllegalStateException("no min y"));
-    int maxx = coords.stream()
-        .map(Coord::x)
-        .max(Comparator.naturalOrder())
-        .orElseThrow(() -> new IllegalStateException("no max x"));
-    int maxy = coords.stream()
-        .map(Coord::y)
-        .max(Comparator.naturalOrder())
-        .orElseThrow(() -> new IllegalStateException("no max y"));
+    int minx = coords.stream().mapToInt(Coord::x).min().getAsInt();
+    int maxx = coords.stream().mapToInt(Coord::x).max().getAsInt();
 
-    for (int y = miny; y <= maxy; y++) {
-      for (int x = minx; x <= maxx; x++) {
-        int tx = x; int ty = y;
-        List<Coord> closest = coords.stream()
-            .sorted(Comparator.comparingInt(c -> c.dist(tx, ty)))
-            .limit(2)
-            .collect(Collectors.toList());
+    int miny = coords.stream().mapToInt(Coord::y).min().getAsInt();
+    int maxy = coords.stream().mapToInt(Coord::y).max().getAsInt();
 
-        if (closest.get(0).dist(tx, ty) != closest.get(1).dist(tx, ty)) {
-          closest.get(0).incArea();
-        }
-      }
-    }
+    IntStream ys = IntStream.range(miny, maxy + 1);
+    IntStream xs = IntStream.range(minx, maxx + 1);
+
+    IntStream.range(miny, maxy + 1).forEach(
+        y -> IntStream.range(minx, maxx + 1).forEach(
+            x -> {
+              List<Coord> closest = coords.stream()
+                  .sorted(Comparator.comparingInt(c -> c.dist(x, y)))
+                  .limit(2)
+                  .collect(Collectors.toList());
+
+              if (closest.get(0).dist(x, y) != closest.get(1).dist(x, y)) {
+                closest.get(0).incArea();
+              }
+            })
+    );
 
     return coords.stream()
-        .map(Coord::area)
-        .max(Comparator.naturalOrder())
-        .orElseThrow(() -> new IllegalStateException("no max area"));
+        .mapToLong(Coord::area)
+        .max()
+        .getAsLong();
+  }
+
+  public long getSafeArea(List<Coord> coords, long maxDist) {
+    int minx = coords.stream().mapToInt(Coord::x).min().getAsInt();
+    int maxx = coords.stream().mapToInt(Coord::x).max().getAsInt();
+
+    int miny = coords.stream().mapToInt(Coord::y).min().getAsInt();
+    int maxy = coords.stream().mapToInt(Coord::y).max().getAsInt();
+
+    return IntStream.range(miny, maxy + 1).reduce(
+        0,
+        (area, y) -> IntStream.range(minx, maxx + 1).reduce(
+            area,
+            (rowArea, x) -> {
+              long posDist = coords.stream()
+                  .mapToLong(c -> c.dist(x, y))
+                  .sum();
+
+              if (posDist < maxDist) {
+                return rowArea + 1;
+              } else {
+                return rowArea;
+              }
+            })
+    );
   }
 }
 
