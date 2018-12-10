@@ -1,12 +1,20 @@
 package com.wilb0t.aoc;
 
+import java.util.ArrayDeque;
+import java.util.Collections;
+import java.util.Deque;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Day9 {
 
-  public static class Circle {
+  interface Circle {
+    void addMarble(int value);
+    int removeCc7();
+  }
+
+  public static class LinkedCircle implements Circle {
     public static class Marble {
       private Marble left;
       private Marble right;
@@ -19,13 +27,14 @@ public class Day9 {
 
     private Marble head;
 
-    public Circle() {
+    public LinkedCircle() {
       head = new Marble(0);
       head.right = head;
       head.left = head;
     }
 
-    void addMarble(int value) {
+    @Override
+    public void addMarble(int value) {
       Marble newHead = new Marble(value);
 
       Marble newHeadLeft = head.right;
@@ -40,7 +49,8 @@ public class Day9 {
       head = newHead;
     }
 
-    int removeCc7() {
+    @Override
+    public int removeCc7() {
       Marble toRemove = head.left.left.left.left.left.left.left;
 
       head = toRemove.right;
@@ -51,8 +61,26 @@ public class Day9 {
     }
   }
 
+  public static class DequeCircle implements Circle {
+    private Deque<Integer> circle = new ArrayDeque<>(Collections.singleton(0));
+
+    @Override
+    public void addMarble(int value) {
+      circle.addLast(circle.removeFirst());
+      circle.addLast(circle.removeFirst());
+      circle.addFirst(value);
+    }
+
+    @Override
+    public int removeCc7() {
+      IntStream.range(0, 7).forEach(i-> circle.addFirst(circle.removeLast()));
+      return circle.removeFirst();
+    }
+  }
+
   public long getHighScore(int players, int maxMarble) {
-    Circle circle = new Circle();
+    //Circle circle = new LinkedCircle();
+    Circle circle = new DequeCircle();
 
     List<Long> scores =
         IntStream.range(0, players).mapToObj(i -> 0L).collect(Collectors.toList());
