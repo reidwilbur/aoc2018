@@ -69,4 +69,9 @@ public class Day12Test {
   public void testRunPart1_input1() {
     assertThat(testInst.runPart1(input1, rules), is(2736));
   }
+
+  @Test
+  public void testRunPart2_input1() {
+    assertThat(testInst.runPart2(input1, rules), is(3150000000905L));
+  }
 }
