@@ -6,7 +6,6 @@ import static org.junit.Assert.assertThat;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,6 +19,7 @@ public class Day13Test {
 
   private static List<String> input1;
   private static List<String> testInput1;
+  private static List<String> testInput2;
 
   @BeforeClass
   public static void beforeClass() throws Exception {
@@ -36,6 +36,16 @@ public class Day13Test {
         "\\-+-/  \\-+--/",
         "  \\------/   "
     ).collect(Collectors.toList());
+
+    testInput2 = Stream.of(
+        "/>-<\\  ",
+        "|   |  ",
+        "| /<+-\\",
+        "| | | v",
+        "\\>+</ |",
+        "  |   ^",
+        "  \\<->/"
+    ).collect(Collectors.toList());
   }
 
   @Before
@@ -51,5 +61,15 @@ public class Day13Test {
   @Test
   public void testFirstCrash_input1() {
    assertThat(testInst.firstCrash(input1), is(new PosBuilder().x(143).y(43).build()));
+  }
+
+  @Test
+  public void testLastCart_case1() {
+    assertThat(testInst.lastCart(testInput2), is(new PosBuilder().x(6).y(4).build()));
+  }
+
+  @Test
+  public void testLastCart_input1() {
+    assertThat(testInst.lastCart(input1), is(new PosBuilder().x(116).y(125).build()));
   }
 }

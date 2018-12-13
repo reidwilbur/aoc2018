@@ -174,5 +174,34 @@ public class Day13 {
       itr += 1;
     }
   }
+
+  public Pos lastCart(List<String> map) {
+    List<Cart> carts = getCarts(map);
+    List<String> wMap = removeCarts(map);
+
+    while (true) {
+      if (carts.size() == 1) {
+        return carts.get(0).pos();
+      }
+
+      List<Cart> ordered = carts.stream()
+          .sorted(Comparator.<Cart>comparingInt(c -> c.pos().y()).thenComparingInt(c -> c.pos().x()))
+          .collect(Collectors.toList());
+
+      for (int i = 0; i < ordered.size(); i++) {
+        Cart c = ordered.get(i);
+        c.tick(wMap);
+        List<Cart> crashed = ordered.stream()
+            .filter(other -> other != c)
+            .filter(other -> other.pos().equals(c.pos()))
+            .collect(Collectors.toList());
+
+        if (crashed.size() > 0) {
+          crashed.add(c);
+          carts.removeAll(crashed);
+        }
+      }
+    }
+  }
 }
 
