@@ -1,11 +1,17 @@
 package com.wilb0t.aoc;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import io.norberg.automatter.AutoMatter;
 import java.util.AbstractMap;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -94,9 +100,72 @@ public class Day16 {
 
   public long samplesMatchAtLeastThree(List<Sample> samples) {
     return samples.stream()
-        .map(s -> operations.values().stream().map(s::opMatches).filter(b -> b).count())
+        .map(s -> operations.values().stream().filter(s::opMatches).count())
         .filter(c -> c >= 3)
         .count();
+  }
+
+  public Optional<Map<Integer, String>> dfs(Set<String> ops, List<Map.Entry<Integer, Set<String>>> nodes) {
+    if (ops.isEmpty() && !nodes.isEmpty()) {
+      return Optional.empty();
+    } if (ops.isEmpty()) {
+      return Optional.of(Collections.emptyMap());
+    } else {
+      int opCode = nodes.get(0).getKey();
+      Set<String> opNames = nodes.get(0).getValue();
+      for (String opName : opNames) {
+        if (ops.contains(opName)) {
+          Set<String> nextOps = ops.stream().filter(op -> !op.equals(opName)).collect(Collectors.toSet());
+          List<Map.Entry<Integer, Set<String>>> nextNodes = nodes.subList(1, nodes.size());
+
+          Optional<Map<Integer, String>> next = dfs(nextOps, nextNodes);
+
+          if (next.isPresent()) {
+            return Optional.of(
+                ImmutableMap.<Integer, String>builder()
+                    .putAll(next.get())
+                    .put(opCode, opName)
+                    .build()
+            );
+          }
+        }
+      }
+      return Optional.empty();
+    }
+  }
+
+  public Map<Integer, String> matchOpCodesToNames(List<Sample> samples) {
+    Map<Integer, Set<String>> matches = samples.stream()
+        .map(s ->
+            new AbstractMap.SimpleEntry<>(
+                s.instr().opCode(),
+                operations.entrySet().stream()
+                    .filter(e -> s.opMatches(e.getValue())).map(Map.Entry::getKey)
+                    .collect(Collectors.toSet())
+            )
+        ).collect(Collectors.toMap(
+            AbstractMap.SimpleEntry::getKey,
+            AbstractMap.SimpleEntry::getValue,
+            (o, n) -> { o.addAll(n); return o;})
+        );
+
+    List<Map.Entry<Integer, Set<String>>> ordered = matches.entrySet().stream()
+        .sorted(Comparator.comparingInt(e -> e.getValue().size()))
+        .collect(Collectors.toList());
+
+    return dfs(operations.keySet(), ordered).get();
+  }
+
+  public int exec(List<Sample> samples, List<Instr> instrs) {
+    Map<Integer, String> ops = matchOpCodesToNames(samples);
+
+    int[] state = new int[]{ 0, 0, 0, 0 };
+    for (Instr instr : instrs) {
+      String opName = ops.get(instr.opCode());
+      Operation op = operations.get(opName);
+      state = op.apply(state, instr);
+    }
+    return state[0];
   }
 }
 

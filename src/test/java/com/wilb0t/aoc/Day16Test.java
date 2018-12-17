@@ -9,13 +9,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Files;
 import java.io.File;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -27,6 +25,8 @@ public class Day16Test {
 
   private static List<Day16.Sample> input1;
   private static Day16.Sample testSample;
+
+  private static List<Day16.Instr> input2;
 
   @BeforeClass
   public static void beforeClass() throws Exception {
@@ -45,6 +45,11 @@ public class Day16Test {
         "9 2 1 2",
         "After:  [3, 2, 2, 1]"
     ));
+
+    input2 = Files.readLines(
+        new File(Day7Test.class.getResource("/Day16_input2.txt").toURI()),
+        Charsets.UTF_8
+    ).stream().map(Day16.Instr::parse).collect(Collectors.toList());
   }
 
   @Before
@@ -64,5 +69,17 @@ public class Day16Test {
   @Test
   public void testSamesMatchThree_input1() {
     assertThat(testInst.samplesMatchAtLeastThree(input1), is(544L));
+  }
+
+  @Test
+  public void testMatchInstrsToOps() {
+    Map<Integer, String> codesToNames = testInst.matchOpCodesToNames(input1);
+
+    assertThat(codesToNames.size(), is(Day16.operations.size()));
+  }
+
+  @Test
+  public void testExec_input2() {
+    assertThat(testInst.exec(input1, input2), is(600));
   }
 }
